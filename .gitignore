@@ -7,3 +7,5 @@ wandb_key
 checkpoints/
 wandb/
 __pycache__/
+.venv/
+video_tokeniser_ckpt/
