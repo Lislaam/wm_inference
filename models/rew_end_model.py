@@ -7,9 +7,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torcheval.metrics.functional import multiclass_confusion_matrix
 
-from .blocks import Conv3x3, Downsample, ResBlocks
-from data import Batch
-from utils import init_lstm, LossAndLogs
+from models.blocks import Conv3x3, Downsample, ResBlocks
+from utils.utils import init_lstm, LossAndLogs
+from utils.batch import Batch
 
 
 @dataclass

@@ -3,11 +3,28 @@ from typing import Generator, List
 
 import torch
 import torch.nn.functional as F
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from torch import nn, Tensor
 
 from .batch import Batch
 from .episode import Episode
 from .segment import Segment, SegmentId
 
+LossAndLogs = Tuple[Tensor, Dict[str, Any]]
+
+def init_lstm(model: nn.Module) -> None:
+    for name, p in model.named_parameters():
+        if "weight_ih" in name:
+            nn.init.xavier_uniform_(p.data)
+        elif "weight_hh" in name:
+            nn.init.orthogonal_(p.data)
+        elif "bias_ih" in name:
+            p.data.fill_(0)
+            # Set forget-gate bias to 1
+            n = p.size(0)
+            p.data[(n // 4) : (n // 2)].fill_(1)
+        elif "bias_hh" in name:
+            p.data.fill_(0)
 
 def collate_segments_to_batch(segments: List[Segment]) -> Batch:
     attrs = ("obs", "act", "rew", "end", "trunc", "mask_padding")
