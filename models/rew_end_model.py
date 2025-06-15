@@ -52,7 +52,7 @@ class RewEndModel(nn.Module):
         x = x.reshape(b, t, -1)  # (b t) e h w -> b t (e h w)
         x, hx_cx = self.lstm(x, hx_cx)
         logits = self.head(x)
-        return logits[:, :, :-2], logits[:, :, -2:], hx_cx
+        return logits[:, :, :-2], logits[:, :, -2:], hx_cx # reward logits, end logits, (hx, cx)
 
     def forward(self, batch: Batch) -> LossAndLogs:
         obs = batch.obs[:, :-1]

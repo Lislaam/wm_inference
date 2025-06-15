@@ -27,29 +27,46 @@ output_dir.mkdir(parents=True, exist_ok=True)
 i = 0
 metadata = []
 while i < args.num_episodes:
-    seed = np.random.randint(0, 10000)
+    seed = np.random.randint(0)
     env = ProcgenGym3Env(num=1, env_name="coinrun", start_level=seed)
-    dataseq = []
+    rgb_seq = []
+    rew_seq = []
+    done_seq = []
 
-    # --- Run episode ---
     for j in range(1000):
         env.act(types_np.sample(env.ac_space, bshape=(env.num,)))
         rew, obs, first = env.observe()
-        dataseq.append(obs["rgb"])
+        
+        rgb_seq.append(obs["rgb"])             # shape (1, 64, 64, 3)
+        rew_seq.append(rew.copy())             # shape (1,)
+        done_seq.append(first.copy())          # shape (1,)
+
         if first:
             break
 
-    # --- Save episode ---
-    if len(dataseq) >= args.min_episode_length:
-        episode_data = np.concatenate(dataseq, axis=0)
-        episode_path = output_dir / f"episode_{i}.npy"
-        np.save(episode_path, episode_data.astype(np.uint8))
-        metadata.append({"path": str(episode_path), "length": len(dataseq)})
-        print(f"Episode {i} completed, length: {len(dataseq)}")
+    if len(rgb_seq) >= args.min_episode_length:
+        rgb = np.concatenate(rgb_seq, axis=0)         # (T, 64, 64, 3)
+        rews = np.concatenate(rew_seq, axis=0)        # (T,)
+        dones = np.concatenate(done_seq, axis=0)      # (T,)
+
+        # Save everything in a dictionary
+        episode = {
+            "rgb": rgb.astype(np.uint8),
+            "reward": rews.astype(np.float32),
+            "done": dones.astype(np.bool_),
+        }
+
+        episode_path = output_dir / f"episode_{i}.npz"
+        np.savez_compressed(episode_path, **episode)
+
+        metadata.append({"path": str(episode_path), "length": len(rgb)})
+        print(f"Episode {i} completed, length: {len(rgb)}")
         i += 1
     else:
-        print(f"Episode too short ({len(dataseq)}), resampling...")
+        print(f"Episode too short ({len(rgb_seq)}), resampling...")
 
 # --- Save metadata ---
 np.save(output_dir / "metadata.npy", metadata)
 print(f"Dataset generated with {len(metadata)} valid episodes")
+
+

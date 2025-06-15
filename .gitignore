@@ -1,5 +1,6 @@
 *.pyc
 *.npy
+*.npz
 *.png
 *.gif
 
@@ -8,6 +9,8 @@ checkpoints/
 wandb/
 __pycache__/
 .venv/
+.venvold/
 video_tokeniser_ckpt/
 rew_end_ckpt/
 lam_ckpt/
+dynamics_ckpt/
