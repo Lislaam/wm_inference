@@ -14,3 +14,4 @@ video_tokeniser_ckpt/
 rew_end_ckpt/
 lam_ckpt/
 dynamics_ckpt/
+trained_models/
