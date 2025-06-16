@@ -10,7 +10,7 @@ from models.rew_end_model import RewEndModel, RewEndModelConfig
 
 
 class CoinRunEpisodeDataset(Dataset):
-    def __init__(self, episode_dir, fraction=0.1):
+    def __init__(self, episode_dir, fraction=1):
         all_files = sorted([os.path.join(episode_dir, f) for f in os.listdir(episode_dir) if f.endswith('.npz')])
         keep = int(len(all_files) * fraction)
         self.files = all_files[:keep]
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     model = RewEndModel(config)
     model = train_with_validation(model, train_loader, val_loader, device="cuda", epochs=epochs)
 
-    torch.save(model.state_dict(), f"rew_end_model_{epochs}.pth")
+    torch.save(model.state_dict(), f"trained_models/rew_end_model_{epochs}.pth")
 
     eval_model(model, eval_loader, device="cuda")
     wandb.finish()
